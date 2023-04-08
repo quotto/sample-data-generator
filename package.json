@@ -1,0 +1,17 @@
+{
+  "name": "openai",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "zip -qr openai.zip index.js node_modules",
+    "deploy": "npm run build && aws lambda update-function-code --function-name sample-data-generator --zip-file fileb://openai.zip"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.1351.0",
+    "openai": "^3.2.1"
+  }
+}
