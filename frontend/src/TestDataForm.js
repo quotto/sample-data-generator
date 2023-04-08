@@ -1,16 +1,42 @@
-import React, { useState } from 'react';
-import { Button, CircularProgress, Grid, MenuItem, TextField, Checkbox, FormControlLabel } from '@mui/material';
+import React, { useState, useRef } from 'react';
+import { Button, CircularProgress, Grid, MenuItem, TextField, Checkbox, FormControlLabel, Typography } from '@mui/material';
 
 import logo from './logo.svg';
 import './App.css';
 import * as axios from 'axios';
 
 const TestDataForm = () => {
+  const inputRef = useRef(null);
   const [outputFormat, setOutputFormat] = useState('csv');
   const [outputCount, setOutputCount] = useState(1);
   const [dataItems, setDataItems] = useState([{ name: '', type: 'string', maxLength: 1, unique: false, description: '', sample: '', variableLength: true }]);
   const [loading, setLoading] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState('');
+
+  const handleExport = () => {
+    const data = JSON.stringify(dataItems, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'test-data-config.json';
+    link.click();
+
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImport = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      const importedData = JSON.parse(e.target.result);
+      setDataItems(importedData);
+    };
+
+    reader.readAsText(file);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,15 +106,15 @@ const TestDataForm = () => {
             />
           </Grid>
           {dataItems.map((item, index) => (
-            <Grid container item xs={12} spacing={2} key={index}>
-              <Grid item xs={3}>
+            <Grid container item xs={12} spacing={1} key={index}>
+              <Grid item xs={2}>
                 <TextField
                   label="項目名"
                   value={item.name}
                   onChange={(e) => handleDataItemChange(index, 'name', e.target.value)}
                 />
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={1}>
                 <TextField
                   select
                   label="データ型"
@@ -101,10 +127,10 @@ const TestDataForm = () => {
                   <MenuItem value="image">画像</MenuItem>
                 </TextField>
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={1}>
                 <TextField
                   type="number"
-                  label="最大バイト長"
+                  label="最大桁数"
                   value={item.maxLength}
                   onChange={(e) => handleDataItemChange(index, 'maxLength', e.target.value)}
                   InputProps={{ inputProps: { min: 1 } }}
@@ -119,7 +145,12 @@ const TestDataForm = () => {
                       onChange={(e) => handleDataItemChange(index, 'unique', e.target.checked)}
                     />
                   }
-                  label="ユニーク"
+                  label={
+                    <Typography variant="caption" color="textSecondary">
+                      ユニーク
+                    </Typography>
+                  }
+                  labelPlacement='top'
                     />
               </Grid>
               <Grid item xs={3}>
@@ -129,14 +160,14 @@ const TestDataForm = () => {
                   onChange={(e) => handleDataItemChange(index, 'description', e.target.value)}
                 />
               </Grid>
-              <Grid item xs={3}>
+              <Grid item xs={2}>
                 <TextField
                   label="サンプル"
                   value={item.sample}
                   onChange={(e) => handleDataItemChange(index, 'sample', e.target.value)}
                 />
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={1}>
                 <FormControlLabel
                   control={
                     <Checkbox
@@ -144,7 +175,12 @@ const TestDataForm = () => {
                       onChange={(e) => handleDataItemChange(index, 'variableLength', e.target.checked)}
                     />
                   }
-                  label="可変バイト長"
+                  label={
+                    <Typography variant="caption" color="textSecondary">
+                      可変長
+                    </Typography>
+                  }
+                  labelPlacement='top'
                 />
               </Grid>
               <Grid item xs={1}>
@@ -162,14 +198,35 @@ const TestDataForm = () => {
               作成
             </Button>
           </Grid>
+          {!loading && downloadUrl && (
+            <Grid item xs={12}>
+              <a href={downloadUrl} target="_blank" rel="noopener noreferrer">
+                テストデータをダウンロード
+              </a>
+            </Grid>
+          )}
+          <Grid container item xs={12}>
+              <Grid item xs={5} />
+              <Grid item xs={1}>
+                <Button variant="contained" onClick={handleExport}>
+                  Export
+                </Button>
+              </Grid>
+              <Grid item xs={1}>
+                <Button variant="outlined" onClick={() => inputRef.current.click()}>
+                  Import
+                </Button>
+                <input
+                  type="file"
+                  accept=".json"
+                  onChange={handleImport}
+                  ref={inputRef}
+                  style={{ display: 'none' }}
+                />
+              </Grid>
+              <Grid item xs={5} />
+          </Grid>
         </>
-      )}
-      {downloadUrl && (
-        <Grid item xs={12}>
-          <a href={downloadUrl} target="_blank" rel="noopener noreferrer">
-            テストデータをダウンロード
-          </a>
-        </Grid>
       )}
     </Grid>
   );

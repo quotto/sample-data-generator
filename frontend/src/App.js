@@ -4,7 +4,7 @@ import { Container } from '@mui/material';
 
 const App = () => {
     return (
-        <Container maxWidth="md">
+        <Container maxWidth="lg">
             <h1>テストデータ作成フォーム</h1>
             <TestDataForm />
         </Container>
