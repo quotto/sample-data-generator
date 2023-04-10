@@ -50,7 +50,7 @@ const TestDataForm = () => {
     try {
       setLoading(true);
       // ヘッダーのContent-Typeをapplication/jsonに設定してリクエストを送信する
-      const response = await axios.post('https://y1coxflu79.execute-api.ap-northeast-1.amazonaws.com/default/sample-data-generator', requestData, {heders: {'Content-Type': 'application/json'}});
+      const response = await axios.post(process.env.REACT_APP_API_URL, requestData, {heders: {'Content-Type': 'application/json'}});
       setDownloadUrl(response.data.url);
     } catch (error) {
       console.error('Error calling API:', error);
