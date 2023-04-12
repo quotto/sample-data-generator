@@ -1,6 +1,8 @@
 import React from 'react';
 import TestDataForm from './TestDataForm';
 import { Container } from '@mui/material';
+import { withAuthenticator, Button, Heading } from '@aws-amplify/ui-react';
+import '@aws-amplify/ui-react/styles.css';
 
 const App = () => {
     return (
@@ -11,4 +13,4 @@ const App = () => {
     );
 };
 
-export default App;
+export default withAuthenticator(App, { includeGreetings: true });
